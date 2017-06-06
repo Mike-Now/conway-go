@@ -192,25 +192,18 @@ func main() {
 
 func tickTimer(b *Board, ch <-chan struct{}) {
 	paused := false
-	timeout := make(chan bool, 1)
-
 	for {
-		go func() {
-			if !paused {
-				timeout <- true
-			}
-		}()
 		select {
 		case <-ch:
 			paused = !paused
-		case <-timeout:
+		default:
 		}
-		time.Sleep(50 * time.Millisecond)
 		if !paused {
 			ui.QueueMain(func() {
 				b.Tick()
 			})
 			b.Redraw()
 		}
+		time.Sleep(50 * time.Millisecond)
 	}
 }
